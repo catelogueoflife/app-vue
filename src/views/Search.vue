@@ -32,12 +32,57 @@
     </md-field>
   </div>
 </template>
-
+<script>
+  export default {
+    data () {
+      return {
+        value: '',
+        results: [],
+        placeholders: ['大象的分布区域', '霸王龙的体型', '翼手龙的简介', '鸵鸟的食物', '金枪鱼的别称'],
+        placeholder: ''
+      }
+    },
+    watch: {
+      '$route.path' (newVal, oldVal) {
+        this.value = this.$route.params.search
+        this.search()
+      }
+    },
+    created () {
+      if (this.$route.params.search) {
+        this.value = this.$route.params.search
+        this.search()
+      }
+    },
+    computed: {
+      size () {
+        return this.value.length > 10 ? 'small' : 'middle'
+      }
+    },
+    methods: {
+      async search () {
+        if (this.value === '') {
+          this.value = this.placeholder
+        }
+        let formdata = new FormData();
+        formdata.append('word',this.value);
+        await this.$store.dispatch('SpeciesSearch',formdata).then(res=>{
+          if (res.code == 200) {
+            this.results = res.data
+          }
+        })
+      },
+      randomPlaceholder () {
+        this.placeholder = this.placeholders[parseInt((Math.random() * this.placeholders.length))]
+        return this.placeholder
+      }
+    }
+  }
+</script>
 <style lang="scss">
   .search {
     margin-right: 0.3rem;
   }
-
   .md-textarea-item__textarea {
     padding: 0.2rem!important;
     color: #111a34 !important;
@@ -45,47 +90,3 @@
     text-indent: 0.5rem!important;
   }
 </style>
-
-<script>
-export default {
-  data () {
-    return {
-      value: '',
-      results: [],
-      placeholders: ['大象的分布区域', '霸王龙的体型', '翼手龙的简介', '鸵鸟的食物', '金枪鱼的别称'],
-      placeholder: ''
-    }
-  },
-  watch: {
-    '$route.path' (newVal, oldVal) {
-      this.value = this.$route.params.search
-      this.search()
-    }
-  },
-  created () {
-    if (this.$route.params.search) {
-      this.value = this.$route.params.search
-      this.search()
-    }
-  },
-  computed: {
-    size () {
-      return this.value.length > 10 ? 'small' : 'middle'
-    }
-  },
-  methods: {
-    async search () {
-      if (this.value === '') {
-        this.value = this.placeholder
-      }
-      await this._$axios.post('/baike/query/' + this.value).then(result => {
-        this.results = result.data
-      })
-    },
-    randomPlaceholder () {
-      this.placeholder = this.placeholders[parseInt((Math.random() * this.placeholders.length))]
-      return this.placeholder
-    }
-  }
-}
-</script>

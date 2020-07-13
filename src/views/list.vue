@@ -33,7 +33,46 @@
     </md-popup>
   </div>
 </template>
-
+<script>
+  export default {
+    props: ['id'],
+    data() {
+      return {
+        items: [],
+        title: '物种百科',
+        showPopup: false,
+        popupItem: {}
+      }
+    },
+    watch: {
+      '$route.path'(newVal, oldVal) {
+        this.getList(this.$route.params.id)
+      }
+    },
+    created() {
+      this.getList(this.$route.params.id)
+    },
+    methods: {
+      async getList(id) {
+        if (id === undefined) {
+          id = ''
+        }
+        let formdata = new FormData();
+        formdata.append('id', id);
+        await this.$store.dispatch('SpeciesList', formdata).then(res => {
+          if (res.code === 200) {
+            this.items = res.data
+          }
+        })
+      },
+      showData(item) {
+        this.showPopup = true
+        this.popupItem = item
+        this.$set(this.popupItem, 'bottom', true)
+      }
+    }
+  }
+</script>
 <style lang="scss" scoped>
   .scroll-list-wrap {
     background: #f3f4f5;
@@ -51,7 +90,7 @@
         line-height: 1;
       }
 
-      .home,.search {
+      .home, .search {
         font-size: 0.6rem;
         color: #0099CC;
       }
@@ -62,7 +101,8 @@
         font-weight: 500;
         color: #111a34;
       }
-      .search{
+
+      .search {
         right: 0.1rem;
         position: absolute;
       }
@@ -91,42 +131,4 @@
       }
     }
   }
-
 </style>
-
-<script>
-import qs from 'qs'
-
-export default {
-  props: ['id'],
-  data () {
-    return {
-      items: [],
-      title: '物种百科',
-      showPopup: false,
-      popupItem: {}
-    }
-  },
-  watch: {
-    '$route.path' (newVal, oldVal) {
-      this.getList(this.$route.params.id)
-    }
-  },
-  created () {
-    this.getList(this.$route.params.id)
-  },
-  methods: {
-    async getList (id) {
-      const url = '/species2000cn/browse/' + (id || '')
-      await this._$axios.post(url, qs.stringify({ otherParam: 'zTreeAsyncTest' })).then(result => {
-        this.items = result.data
-      })
-    },
-    showData (item) {
-      this.showPopup = true
-      this.popupItem = item
-      this.$set(this.popupItem, 'bottom', true)
-    }
-  }
-}
-</script>
