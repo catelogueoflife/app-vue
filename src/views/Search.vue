@@ -34,7 +34,7 @@
 </template>
 <script>
   export default {
-    data () {
+    data() {
       return {
         value: '',
         results: [],
@@ -43,36 +43,36 @@
       }
     },
     watch: {
-      '$route.path' (newVal, oldVal) {
+      '$route.path'(newVal, oldVal) {
         this.value = this.$route.params.search
         this.search()
       }
     },
-    created () {
+    created() {
       if (this.$route.params.search) {
         this.value = this.$route.params.search
         this.search()
       }
     },
     computed: {
-      size () {
+      size() {
         return this.value.length > 10 ? 'small' : 'middle'
       }
     },
     methods: {
-      async search () {
+      async search() {
         if (this.value === '') {
           this.value = this.placeholder
         }
         let formdata = new FormData();
-        formdata.append('word',this.value);
-        await this.$store.dispatch('SpeciesSearch',formdata).then(res=>{
+        formdata.append('word', this.value);
+        await this.$store.dispatch('SpeciesSearch', formdata).then(res => {
           if (res.code == 200) {
             this.results = res.data
           }
         })
       },
-      randomPlaceholder () {
+      randomPlaceholder() {
         this.placeholder = this.placeholders[parseInt((Math.random() * this.placeholders.length))]
         return this.placeholder
       }
@@ -83,10 +83,11 @@
   .search {
     margin-right: 0.3rem;
   }
+
   .md-textarea-item__textarea {
-    padding: 0.2rem!important;
+    padding: 0.2rem !important;
     color: #111a34 !important;
     font: 500 0.32rem Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, 微软雅黑, Arial, sans-serif;
-    text-indent: 0.5rem!important;
+    text-indent: 0.5rem !important;
   }
 </style>
